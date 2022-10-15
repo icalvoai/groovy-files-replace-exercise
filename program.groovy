@@ -3,7 +3,7 @@ import java.nio.file.Paths;
 import static groovy.io.FileType.FILES;
 
 static void main(String[] args) { 
-    
+
     // Se calcula la cantidad de argumentos una sola vez
     args_size = args.size();
     if((args_size == 3) || (args_size == 4)){
@@ -43,12 +43,12 @@ def get_hello(){
     return "hello world";
 }
 
-def get_subfolders(PARENT_FOLDER){
+def get_subfolders(parent_folder){
     // list that contains all the folders to process the files
     List<String> subfolders = [];
-    subfolders.add(PARENT_FOLDER);
+    subfolders.add(parent_folder);
 
-    dh = new File(PARENT_FOLDER);
+    dh = new File(parent_folder);
 
     // iterates recursively and gets all the subfolders
     dh.eachFileRecurse {
@@ -60,11 +60,11 @@ def get_subfolders(PARENT_FOLDER){
     return subfolders;
 }
 
-def get_textfiles(FOLDER){
+def get_textfiles(folder){
     // list that contains all the text files in FOLDER
     List<String> textfiles = [];
 
-    dh = new File(FOLDER);
+    dh = new File(folder);
 
     // iterates and gets all the text files
     dh.eachFile {
@@ -76,34 +76,56 @@ def get_textfiles(FOLDER){
     return textfiles;
 }
 
-def process_file(FOLDER, FILE, ORIGINAL_TEXT, REPLACE_TEXT){
-    def replace = { File source, String toSearch, String replacement ->
-        source.write(source.text.replaceAll(toSearch, replacement))
-    }
-    file = new File(FOLDER + "\\" + FILE);
+def get_ocurrences(file_obj, sub_sequence){
+    return file.text.count(sub_sequence);
+}
+    
 
-    file.write(file.text.replaceAll(ORIGINAL_TEXT, REPLACE_TEXT));
-    IJFDKJFKJD;
+def process_file(folder, textfile, original_text, replace_text, processed_files){
+    // Opens the file to be processed
+    absolute_path = folder + "\\" + textfile
+    file = new File(absolute_path);
+
+    // Check if the replace text is on the text
+    occurences = get_ocurrences(file, original_text);
+    println(occurences);
+
+    // If there are occurrences, replace the text
+    if(occurences > 0){
+        println("---> FILE " + textfile + " HAS " + occurences.toString() + " OCURRENCES, READY TO BE PROCESSED");
+        processed_files.add(absolute_path);
+    }
+
+    else{
+        println("---> FILE " + textfile + " HAS 0 OCURRENCES, ITS GONNA BE IGNORED")
+    }
+    //println(PROCESSED_FILES);
+
+    //file.write(file.text.replaceAll(original_text, replace_text));
+    //IJFDKJFKJD;
 }
 
 
-def process_folder(FOLDER, ORIGINAL_TEXT, REPLACE_TEXT){
-    println("\n PROCESSING: " + FOLDER);
+def process_folder(folder, original_text, replace_text, processed_files){
+    println("\n+ PROCESSING FOLDER: " + folder);
 
-    textfiles = get_textfiles(FOLDER);
+    textfiles = get_textfiles(folder);
     
     // for each file in current folder, process it
     textfiles.each{
-        process_file(FOLDER, it, ORIGINAL_TEXT, REPLACE_TEXT);
+        process_file(folder, it, original_text, replace_text, processed_files);
     };
     println("\n \n");
 
 };
 
 
-def process_all(PARENT_FOLDER, ORIGINAL_TEXT, REPLACE_TEXT, MODIFIED_FILES_LIST){
+def process_all(parent_folder, original_text, replace_text, MODIFIED_FILES_LIST){
+    // List of processed files
+    List<String> processed_files = [];
+
     // get all subfolders in parent folder
-    List<String> sub_folders = get_subfolders(PARENT_FOLDER);
+    List<String> sub_folders = get_subfolders(parent_folder);
 
     println("* Here is the list of all the folders that are going to be processed: \n");
     sub_folders.each{ 
@@ -112,7 +134,9 @@ def process_all(PARENT_FOLDER, ORIGINAL_TEXT, REPLACE_TEXT, MODIFIED_FILES_LIST)
 
     // for each sub folder, process the files in it
     sub_folders.each{ 
-        process_folder(it, ORIGINAL_TEXT, REPLACE_TEXT);
+        process_folder(it, original_text, replace_text, processed_files);
     };
+
+    println(processed_files);
 
 }
