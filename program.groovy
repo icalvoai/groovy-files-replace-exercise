@@ -43,6 +43,18 @@ def get_hello(){
     return "hello world";
 }
 
+def create_folder(path_of_folder){
+    folder = new File(path_of_folder);
+    folder.mkdir();
+}
+
+def copy_file(source, destiny){
+    // copy file from source to destiny
+    def src = new File(source);
+    def dst = new File(destiny);
+    dst << src.text;
+}
+
 def get_subfolders(parent_folder){
     // list that contains all the folders to process the files
     List<String> subfolders = [];
@@ -81,62 +93,85 @@ def get_ocurrences(file_obj, sub_sequence){
 }
     
 
-def process_file(folder, textfile, original_text, replace_text, processed_files){
+def process_file(folder, textfile, original_text, replace_text, processed_files, parent_folder, backup_folder){
     // Opens the file to be processed
     absolute_path = folder + "\\" + textfile
     file = new File(absolute_path);
 
     // Check if the replace text is on the text
     occurences = get_ocurrences(file, original_text);
-    println(occurences);
 
     // If there are occurrences, replace the text
     if(occurences > 0){
+        // Log the occurrences
         println("---> FILE " + textfile + " HAS " + occurences.toString() + " OCURRENCES, READY TO BE PROCESSED");
+
+        // Keep track of processed files
         processed_files.add(absolute_path);
+
+        // Move original file to the backup folder
+        copy_file(absolute_path, absolute_path.replace(parent_folder, backup_folder));
+
+        // Change the original text with the replacement text
+        file.write(file.text.replaceAll(original_text, replace_text));  
     }
 
     else{
         println("---> FILE " + textfile + " HAS 0 OCURRENCES, ITS GONNA BE IGNORED")
+        // Move original file to the backup folder
+        copy_file(absolute_path, absolute_path.replace(parent_folder, backup_folder));
     }
-    //println(PROCESSED_FILES);
-
-    //file.write(file.text.replaceAll(original_text, replace_text));
-    //IJFDKJFKJD;
 }
 
 
-def process_folder(folder, original_text, replace_text, processed_files){
-    println("\n+ PROCESSING FOLDER: " + folder);
+def process_folder(current_folder, original_text, replace_text, processed_files, parent_folder, backup_folder){
+    // First, create backup folder
+    create_folder(current_folder.replace(parent_folder, backup_folder));
 
-    textfiles = get_textfiles(folder);
+    // get all textfiles in folder
+    textfiles = get_textfiles(current_folder);
     
     // for each file in current folder, process it
     textfiles.each{
-        process_file(folder, it, original_text, replace_text, processed_files);
+        process_file(current_folder, it, original_text, replace_text, processed_files, parent_folder, backup_folder);
     };
-    println("\n \n");
 
 };
-
+    
 
 def process_all(parent_folder, original_text, replace_text, MODIFIED_FILES_LIST){
-    // List of processed files
+
+    
+    // Variables needed for the backup and track of changed files
     List<String> processed_files = [];
+    backup_folder = parent_folder + "_backup";
+
+    // Creates backupfolder before start
+    create_folder(backup_folder);
 
     // get all subfolders in parent folder
     List<String> sub_folders = get_subfolders(parent_folder);
 
+    println("\n##############################");
+    println("\n######## INITIAL STAGE #######");
+    println("\n##############################\n");
+
     println("* Here is the list of all the folders that are going to be processed: \n");
     sub_folders.each{ 
-        println("- " + it) 
+        println("- " + it);
     };
+
+    println("\n##############################");
+    println("\n###### PROCESSING STAGE ######");
+    println("\n##############################");
 
     // for each sub folder, process the files in it
     sub_folders.each{ 
-        process_folder(it, original_text, replace_text, processed_files);
+        println("\n+ PROCESSING FOLDER: " + it);
+        process_folder(it, original_text, replace_text, processed_files, parent_folder, backup_folder);
+
     };
 
-    println(processed_files);
+    println(processed_files.length());
 
 }
