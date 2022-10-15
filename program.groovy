@@ -2,6 +2,9 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import static groovy.io.FileType.FILES;
 
+import groovy.time.TimeCategory 
+import groovy.time.TimeDuration
+
 static void main(String[] args) { 
 
     // Se calcula la cantidad de argumentos una sola vez
@@ -10,10 +13,10 @@ static void main(String[] args) {
         String PARENT_FOLDER = args[0];
         String ORIGINAL_TEXT = args[1];
         String REPLACE_TEXT = args[2];
-        String MODIFIED_FILES_LIST = "";
+        String MODIFIED_FILES_FILE = "";
         
         if(args_size == 4){
-            MODIFIED_FILES_LIST = args[3];
+            MODIFIED_FILES_FILE = args[3];
         }
 
         /* TODO
@@ -25,7 +28,7 @@ static void main(String[] args) {
 
         if (Files.isDirectory(Paths.get(PARENT_FOLDER))) {
             println("\nThe input folder exists, the processing will begin... \n");
-            process_all(PARENT_FOLDER, ORIGINAL_TEXT, REPLACE_TEXT, MODIFIED_FILES_LIST);
+            process_all(PARENT_FOLDER, ORIGINAL_TEXT, REPLACE_TEXT, MODIFIED_FILES_FILE);
         }
 
         else{
@@ -39,10 +42,6 @@ static void main(String[] args) {
     }
 }
 
-def get_hello(){
-    return "hello world";
-}
-
 def create_folder(path_of_folder){
     folder = new File(path_of_folder);
     folder.mkdir();
@@ -54,6 +53,12 @@ def copy_file(source, destiny){
     def dst = new File(destiny);
     dst << src.text;
 }
+
+def write_list_to_textfile(path_of_file, list_of_strings){
+    File file = new File(path_of_file);
+    list_of_strings.each { val -> file << val+"\n"};
+}
+
 
 def get_subfolders(parent_folder){
     // list that contains all the folders to process the files
@@ -136,11 +141,28 @@ def process_folder(current_folder, original_text, replace_text, processed_files,
         process_file(current_folder, it, original_text, replace_text, processed_files, parent_folder, backup_folder);
     };
 
-};
+}
+
+def create_modified_files_file(file_path, processed_files){
+    if(file_path.endsWith('.txt')){
+        try {
+            write_list_to_textfile(file_path, processed_files);
+            println("--> FILE CREATED SUCCESSFULLY ON PATH: "+file_path)
+        } 
+        
+        catch(Exception ex) {
+            println("--> THERE WAS AN ERROR TRYING TO CREATE THE LIST OF PROCESSED FILES, CHECK PATH. THE FILE IS NOT BEING CREATED THIS TIME")
+        }
+    }
+
+    else {
+        println("--> MODIFIED FILES FILE PATH HAS TO END ON .txt, THE FILE IS NOT BEING CREATED THIS TIME");
+    }
+}
     
 
-def process_all(parent_folder, original_text, replace_text, MODIFIED_FILES_LIST){
-
+def process_all(parent_folder, original_text, replace_text, modified_files_file){
+    Date start = new Date();
     
     // Variables needed for the backup and track of changed files
     List<String> processed_files = [];
@@ -172,6 +194,22 @@ def process_all(parent_folder, original_text, replace_text, MODIFIED_FILES_LIST)
 
     };
 
-    println(processed_files.length());
+    // create the modified files file
+    if((modified_files_file.length() > 0) && (processed_files.size())){
+        println("\n*** CREATING OUTPUT FILE OF MODIFIED FILES")
+        create_modified_files_file(modified_files_file, processed_files);
+    }
+
+    println("\n##############################");
+    println("\n######## FINAL STAGE #########");
+    println("\n##############################\n");
+
+    println("TOTAL PROCESSED FILES: " + processed_files.size())
+
+    
+
+    Date stop = new Date();
+    TimeDuration td = TimeCategory.minus(stop, start);
+    println("PROGRAM TIME DURATION: " + td.toString());
 
 }
