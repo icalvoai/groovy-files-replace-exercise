@@ -25,7 +25,7 @@ static void main(String[] args) {
 
         if (Files.isDirectory(Paths.get(PARENT_FOLDER))) {
             println("\nThe input folder exists, the processing will begin... \n");
-            process_all(PARENT_FOLDER);
+            process_all(PARENT_FOLDER, ORIGINAL_TEXT, REPLACE_TEXT, MODIFIED_FILES_LIST);
         }
 
         else{
@@ -76,24 +76,32 @@ def get_textfiles(FOLDER){
     return textfiles;
 }
 
-def process_file(FOLDER, FILE):
+def process_file(FOLDER, FILE, ORIGINAL_TEXT, REPLACE_TEXT){
+    def replace = { File source, String toSearch, String replacement ->
+        source.write(source.text.replaceAll(toSearch, replacement))
+    }
+    file = new File(FOLDER + "\\" + FILE);
+
+    file.write(file.text.replaceAll(ORIGINAL_TEXT, REPLACE_TEXT));
+    IJFDKJFKJD;
+}
 
 
-def process_folder(FOLDER){
+def process_folder(FOLDER, ORIGINAL_TEXT, REPLACE_TEXT){
     println("\n PROCESSING: " + FOLDER);
 
     textfiles = get_textfiles(FOLDER);
     
     // for each file in current folder, process it
     textfiles.each{
-        
+        process_file(FOLDER, it, ORIGINAL_TEXT, REPLACE_TEXT);
     };
     println("\n \n");
 
 };
 
 
-def process_all(PARENT_FOLDER){
+def process_all(PARENT_FOLDER, ORIGINAL_TEXT, REPLACE_TEXT, MODIFIED_FILES_LIST){
     // get all subfolders in parent folder
     List<String> sub_folders = get_subfolders(PARENT_FOLDER);
 
@@ -104,7 +112,7 @@ def process_all(PARENT_FOLDER){
 
     // for each sub folder, process the files in it
     sub_folders.each{ 
-        process_folder(it);
+        process_folder(it, ORIGINAL_TEXT, REPLACE_TEXT);
     };
 
 }
