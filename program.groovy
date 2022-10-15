@@ -5,7 +5,7 @@ import static groovy.io.FileType.FILES;
 static void main(String[] args) { 
     
     // Se calcula la cantidad de argumentos una sola vez
-    args_size = args.size()
+    args_size = args.size();
     if((args_size == 3) || (args_size == 4)){
         String PARENT_FOLDER = args[0];
         String ORIGINAL_TEXT = args[1];
@@ -24,33 +24,87 @@ static void main(String[] args) {
         */
 
         if (Files.isDirectory(Paths.get(PARENT_FOLDER))) {
-            println("The input folder exists, the processing will begin...");
-
-            sub_folders = get_subfolders(PARENT_FOLDER);
-            println(sub_folders);
+            println("\nThe input folder exists, the processing will begin... \n");
+            process_all(PARENT_FOLDER);
         }
 
         else{
-            println("The input folder does not exist or is incorrect, please try again");
+            println("\nThe input folder does not exist or is incorrect, please try again");
         }
 
     }
 
     else{
-        println("Invalid arguments number");
+        println("\nInvalid arguments number");
     }
 }
 
-String get_hello(){
+def get_hello(){
     return "hello world";
 }
 
-String[] get_subfolders(PARENT_FOLDER){
+def get_subfolders(PARENT_FOLDER){
+    // list that contains all the folders to process the files
+    List<String> subfolders = [];
+    subfolders.add(PARENT_FOLDER);
 
     dh = new File(PARENT_FOLDER);
+
+    // iterates recursively and gets all the subfolders
     dh.eachFileRecurse {
-        
-        println(it)
+        // if there is not a dot in the file path, we add that to the subfolder list.
+        if(it.name.indexOf('.') < 0){
+            subfolders.add(it.absolutePath);
+        }
     }
-    return 0;
+    return subfolders;
+}
+
+def get_textfiles(FOLDER){
+    // list that contains all the text files in FOLDER
+    List<String> textfiles = [];
+
+    dh = new File(FOLDER);
+
+    // iterates and gets all the text files
+    dh.eachFile {
+        // if the file ends with .txt, its added to the list
+        if(it.name.endsWith('.txt')){
+            textfiles.add(it.name);
+        }
+    }
+    return textfiles;
+}
+
+def process_file(FOLDER, FILE):
+
+
+def process_folder(FOLDER){
+    println("\n PROCESSING: " + FOLDER);
+
+    textfiles = get_textfiles(FOLDER);
+    
+    // for each file in current folder, process it
+    textfiles.each{
+        
+    };
+    println("\n \n");
+
+};
+
+
+def process_all(PARENT_FOLDER){
+    // get all subfolders in parent folder
+    List<String> sub_folders = get_subfolders(PARENT_FOLDER);
+
+    println("* Here is the list of all the folders that are going to be processed: \n");
+    sub_folders.each{ 
+        println("- " + it) 
+    };
+
+    // for each sub folder, process the files in it
+    sub_folders.each{ 
+        process_folder(it);
+    };
+
 }
