@@ -26,7 +26,7 @@ static void main(String[] args) {
         }
 
         if (Files.isDirectory(Paths.get(ROOT_FOLDER))) {
-            println("\nThe input folder exists, the processing will begin... \n");
+            println("\nThe input folder exists, the processing will begin...");
             process_all(ROOT_FOLDER, ORIGINAL_TEXT, REPLACE_TEXT, MODIFIED_FILES_FILE);
         }
 
