@@ -6,7 +6,7 @@ This is an exercise for the Accenture interview process.
 * Java
 * Groovy
 
-Follow this tutorial to install: [Link to youtube Here](https://www.youtube.com/watch?v=16kvUkp8Z3M&ab_channel=AmitThinks)
+Follow this tutorial to install to install both: [Link to youtube here](https://www.youtube.com/watch?v=16kvUkp8Z3M&ab_channel=AmitThinks)
 
 ## How to run the script
 
@@ -18,6 +18,9 @@ Example:
 
 ```console
 cd "path/to/program"
+```
+
+```console
 groovy program.groovy "C:\path_to_folder" ipsum new_ipsum "C:\changed_files.txt"
 ```
 

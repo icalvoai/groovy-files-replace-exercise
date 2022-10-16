@@ -66,6 +66,7 @@ def copy_file(source, destiny){
     */
     def src = new File(source);
     def dst = new File(destiny);
+    dst.text = "";
     dst << src.text;
 }
 
