@@ -80,6 +80,7 @@ def write_list_to_textfile(path_of_file, list_of_strings){
             void
     */
     File file = new File(path_of_file);
+    file.text = "";
     list_of_strings.each { val -> file << val+"\n"};
 }
 
@@ -97,12 +98,13 @@ def get_subfolders(folder){
     List<String> subfolders = [];
     subfolders.add(folder);
 
-    dh = new File(folder);
+    dir = new File(folder);
 
     // iterates recursively and gets all the subfolders
-    dh.eachFileRecurse {
+    dir.eachFileRecurse {
         // if there is not a dot in the file path, we add that to the subfolder list.
-        if(it.name.indexOf('.') < 0){
+        //if(it.name.indexOf('.') < 0){
+        if(it.isDirectory()){
             subfolders.add(it.absolutePath);
         }
     }
@@ -126,7 +128,7 @@ def get_textfiles(folder){
     // iterates and gets all the text files
     dh.eachFile {
         // if the file ends with .txt, its added to the list
-        if(it.name.endsWith('.txt')){
+        if(it.name.endsWith('.txt') && it.isFile()){
             textfiles.add(it.name);
         }
     }
